@@ -1,0 +1,35 @@
+﻿# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+.venv/
+venv/
+
+# Environment
+.env
+.env.*
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Docker persistent data
+postgres_data/
+n8n_data/
+
+# Local generated output
+outputs/
+
+# Logs
+*.log
+
+# Build artifacts
+dist/
+build/
+
+# Node (if frontend added later)
+node_modules/
