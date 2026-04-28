@@ -1,4 +1,4 @@
-﻿services:
+services:
   postgres:
     image: postgres:18
     restart: unless-stopped
@@ -7,7 +7,7 @@
       POSTGRES_PASSWORD: n8n_password
       POSTGRES_DB: n8n
     volumes:
-      - ./postgres_data:/var/lib/postgresql/data
+      - ./postgres_data:/var/lib/postgresql
 
   n8n:
     image: n8nio/n8n:latest
