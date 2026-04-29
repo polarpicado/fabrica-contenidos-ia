@@ -3,10 +3,68 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Web en construcción</title>
+  <title>Galeria de Outputs</title>
+  <style>
+    :root { --bg:#f5f7fb; --card:#ffffff; --text:#0f172a; --muted:#475569; --line:#dbe3ef; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: Arial, sans-serif; color:var(--text); background:var(--bg); }
+    .wrap { max-width: 1280px; margin: 0 auto; padding: 24px; }
+    h1 { margin: 0 0 8px; font-size: 28px; }
+    .meta { margin: 0 0 20px; color: var(--muted); }
+    .day { margin: 24px 0 8px; font-size: 20px; border-bottom:1px solid var(--line); padding-bottom:8px; }
+    .grid { display:grid; grid-template-columns: repeat(auto-fill,minmax(220px,1fr)); gap: 14px; }
+    .card { background:var(--card); border:1px solid var(--line); border-radius:12px; overflow:hidden; text-decoration:none; }
+    .thumb { width:100%; aspect-ratio: 1 / 1; object-fit:cover; display:block; background:#e2e8f0; }
+    .cap { padding:10px; font-size:12px; color:var(--muted); word-break:break-all; }
+  </style>
 </head>
 <body>
-  <h1>Tu web está lista para empezar</h1>
-  <p>Sirviendo desde Nginx.</p>
+  <div class="wrap">
+    <h1>Galeria de Imagenes Generadas</h1>
+    <p class="meta">Organizado por fecha extraida del nombre del archivo</p>
+    <div id="app">Cargando...</div>
+  </div>
+  <script>
+    async function load() {
+      const app = document.getElementById('app');
+      try {
+        const res = await fetch('/api/outputs-index');
+        if (!res.ok) throw new Error('No se pudo obtener listado');
+        const data = await res.json();
+        const groups = {};
+        for (const item of data.items || []) {
+          if (!groups[item.date]) groups[item.date] = [];
+          groups[item.date].push(item);
+        }
+        const dates = Object.keys(groups).sort((a,b)=>a<b?1:-1);
+        if (!dates.length) {
+          app.textContent = 'No hay imagenes en /outputs todavia.';
+          return;
+        }
+        app.innerHTML = '';
+        for (const d of dates) {
+          const h = document.createElement('h2');
+          h.className = 'day';
+          h.textContent = d;
+          app.appendChild(h);
+          const grid = document.createElement('div');
+          grid.className = 'grid';
+          for (const img of groups[d]) {
+            const card = document.createElement('a');
+            card.className = 'card';
+            card.href = '/api' + img.public_path;
+            card.target = '_blank';
+            card.rel = 'noopener noreferrer';
+            card.innerHTML = `<img class="thumb" src="/api${img.public_path}" alt="${img.filename}"><div class="cap">${img.filename}</div>`;
+            grid.appendChild(card);
+          }
+          app.appendChild(grid);
+        }
+      } catch (e) {
+        app.textContent = 'Error cargando galeria: ' + (e.message || e);
+      }
+    }
+    load();
+  </script>
 </body>
 </html>

@@ -10,6 +10,9 @@ venv/
 # Environment
 .env
 .env.*
+*.env
+data_confidencial.txt
+secrets/
 
 # OS / IDE
 .DS_Store
@@ -23,6 +26,7 @@ n8n_data/
 
 # Local generated output
 outputs/
+*.jsonl
 
 # Logs
 *.log
@@ -33,3 +37,7 @@ build/
 
 # Node (if frontend added later)
 node_modules/
+
+# Temp / cache
+*.tmp
+*.bak
