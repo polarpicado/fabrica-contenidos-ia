@@ -36,15 +36,6 @@ Valida:
 - Home pública vía tunnel
 - Índice de outputs público
 
-## 🔐 Seguridad (pendiente recomendada)
-Se detectaron hallazgos con `pip-audit`:
-- `cairosvg 2.7.1` → actualizar a `>=2.9.0`
-- `requests 2.32.3` → actualizar a `>=2.32.4`
-- `starlette 0.47.3` → actualizar a `>=0.49.1`
-- `pip 25.0.1` → actualizar en imagen base
-
-También se recomienda mover secretos de `docker-compose.yml` a `.env`.
-
 ## 🛠️ Cambios recientes
 - Endpoint `GET /outputs-index` para listar imágenes por fecha.
 - Galería web agrupada por fecha, con preview y apertura en nueva pestaña.
