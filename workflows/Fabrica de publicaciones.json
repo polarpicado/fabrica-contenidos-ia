@@ -1,0 +1,584 @@
+{
+  "name": "Fabrica de publicaciones",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "documentId": {
+          "__rl": true,
+          "value": "1C99Y_ju1DBGa3NR2qWqJeVO8LtCxsAfL6xU2fNHICCk",
+          "mode": "list",
+          "cachedResultName": "Generación de Publicaciones (Respuestas)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1C99Y_ju1DBGa3NR2qWqJeVO8LtCxsAfL6xU2fNHICCk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 161154517,
+          "mode": "list",
+          "cachedResultName": "Respuestas de formulario 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1C99Y_ju1DBGa3NR2qWqJeVO8LtCxsAfL6xU2fNHICCk/edit#gid=161154517"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "typeVersion": 1,
+      "position": [
+        656,
+        -640
+      ],
+      "id": "fab7411a-f102-4e71-88c1-7f0129260bf3",
+      "name": "Google Sheets Trigger",
+      "credentials": {
+        "googleSheetsTriggerOAuth2Api": {
+          "id": "PgOO2zJmiYks4fG6",
+          "name": "Google Sheets Trigger account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "devstral-latest",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatMistralCloud",
+      "typeVersion": 1,
+      "position": [
+        1184,
+        -416
+      ],
+      "id": "adb680c5-0bc3-46a5-8eee-63ea2c894f84",
+      "name": "Mistral Cloud Chat Model",
+      "credentials": {
+        "mistralCloudApi": {
+          "id": "1ZOhCq74il2Az6e6",
+          "name": "Mistral Cloud account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://router.huggingface.co/hf-inference/models/black-forest-labs/FLUX.1-schnell",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "{\n  \"Authorization\": \"Bearer {{$env.HF_API_TOKEN}}\",\n  \"Content-Type\": \"application/json\",\n  \"Accept\": \"image/png\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{\n  {\n    \"inputs\": `Create ONE realistic veterinary clinic photograph.\n\nUse this scene idea, but obey the rules below:\n${$json.prompt_imagen}\n\nMANDATORY RULES:\n- Generate only a realistic veterinary photograph.\n- Do not create a poster, flyer, ad, template, banner, typography, UI, frame, button, badge, card, logo, watermark, icon, or graphic design.\n- Do not add any text, letters, numbers, symbols, labels, titles, captions, signs, menus, or readable/wrong words.\n- The image must clearly show a veterinary context with a dog or cat and a veterinarian.\n- If there is a wound, lesion, inflammation or dermatological issue, it must be on the animal, clinically visible, not grotesque, and not confused with human anatomy.\n- Use soft clinical lighting, clean clinic background, realistic photography, high quality.\n- Avoid floating objects, distorted anatomy, extra limbs, human body parts, confusing close-ups, excessive gore.\n\nComposition:\nLeave clean negative space around the subject so text can be added later outside the model.`\n  }\n}}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1680,
+        -720
+      ],
+      "id": "5483abb5-35f1-4f82-96ee-abb5d85812bf",
+      "name": "Generación de Imagen"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Actúa como un estratega senior en contenido EdTech de Medicina Veterinaria.\n\nObjetivo: crear contenido para redes (Instagram/Facebook) con enfoque clínico real, tono profesional y estilo tipo Veterinario Emprendedor.\n\n━━━━━━━━━━━━━━━━━━━━━━━\nENTRADA\n━━━━━━━━━━━━━━━━━━━━━━━\nTema: {{ $json.Tema }}\nPilar: {{ $json.Pilar }}\n\n━━━━━━━━━━━━━━━━━━━━━━━\nSALIDA\n━━━━━━━━━━━━━━━━━━━━━━━\n\nDevuelve SOLO un array JSON válido con 4 variantes.\n\nFormato:\n\n[\n  {\n    \"titular\": \"\",\n    \"textocorto\": \"\",\n    \"cta\": \"\",\n    \"prompt_imagen\": \"\",\n    \"caption\": \"\",\n    \"hashtags\": [],\n    \"layout\": {\n      \"tipo\": \"\",\n      \"prioridad_visual\": \"\",\n      \"color_principal\": \"#1E4ED8\",\n      \"color_acento\": \"#E91E63\",\n      \"zona_titulo\": \"\",\n      \"zona_texto\": \"\",\n      \"zona_imagen\": \"\",\n      \"seed\": \"Clinica_Tradicional_2026\",\n      \"color1\": \"#E32160\",\n      \"color2\": \"#4521E3\"\n    }\n  }\n]\n\nSIN markdown. SIN explicaciones.\n\n━━━━━━━━━━━━━━━━━━━━━━━\nESTILO (CLAVE)\n━━━━━━━━━━━━━━━━━━━━━━━\n\n- Tono clínico, directo y con autoridad\n- Habla al veterinario\n- Genera duda / incomodidad profesional\n- Basado en errores reales de consulta\n\n━━━━━━━━━━━━━━━━━━━━━━━\nCAMPOS\n━━━━━━━━━━━━━━━━━━━━━━━\n\ntitular:\n- Máx 8 palabras\n- Tipo:\n  pregunta incómoda / error / advertencia\n\ntextocorto:\n- Máx 5 palabras\n- Refuerzo directo\n\ncta:\n- Máx 4 palabras\n- Acción clara (ej: Mejora tu criterio)\n\n━━━━━━━━━━━━━━━━━━━━━━━\nCAPTION (ESTRUCTURA OBLIGATORIA)\n━━━━━━━━━━━━━━━━━━━━━━━\n\n1. Problema clínico real (2–3 líneas)\n2. Explicación breve\n3. Lista de errores ❌ (mínimo 3)\n4. Consecuencia clínica\n5. Qué incluye el contenido ✔️\n6. Cierre con CTA\n\nFormato EXACTO:\n\nTexto inicial\n\n👉 Explicación breve\n\n❌ Error  \n❌ Error  \n❌ Error  \n\n👉 Resultado\n\nEn este contenido verás:\n✔️ punto  \n✔️ punto  \n✔️ punto  \n\n🎯  \n🔴 Inscríbete en [NOMBRE DEL CURSO] en el link de nuestra biografía @veterinarioemprendedor\n\n━━━━━━━━━━━━━━━━━━━━━━━\nprompt_imagen\n━━━━━━━━━━━━━━━━━━━━━━━\n\n- En inglés\n- Debe incluir SIEMPRE:\n  veterinarian + dog or cat + veterinary clinic + examination\n- Añadir:\n  \"dog or cat clearly visible and protagonist\"\n- Estilo:\n  realistic photography, soft clinical lighting, clean background\n\n━━━━━━━━━━━━━━━━━━━━━━━\nhashtags\n━━━━━━━━━━━━━━━━━━━━━━━\n\n- 5 a 7\n- Mezcla:\n  #MedicinaVeterinaria\n  #Veterinarios\n  #VetLife\n  + específicos\n\n━━━━━━━━━━━━━━━━━━━━━━━\nlayout.tipo (CRÍTICO)\n━━━━━━━━━━━━━━━━━━━━━━━\n\nUsar SOLO uno de estos:\n\nleft_text_right_image\ntop_text_bottom_image\nimage_background_card_text\nhero_top_card\ncircle_center_info\ntext_image_circle_bottom\nlayout4\nlayout5\nlayout6\ncanva_v1\ncanva_v2\ncanva_v3\nhero_top_card_v1\nhero_top_card_v2\nhero_top_card_v3\ncircle_center_info_v1\ncircle_center_info_v2\ncircle_center_info_v3\ntext_image_circle_bottom_v1\ntext_image_circle_bottom_v2\ntext_image_circle_bottom_v3\nfriend_bg_v1\n\nRegla:\n- NO inventar nombres\n- Si dudas → usar \"canva_v1\"\n\n━━━━━━━━━━━━━━━━━━━━━━━\nRESTRICCIONES\n━━━━━━━━━━━━━━━━━━━━━━━\n\n- PROHIBIDO usar números o estadísticas\n- NO repetir ideas\n- Frases cortas\n- NO contenido genérico\n\n━━━━━━━━━━━━━━━━━━━━━━━\nOBJETIVO\n━━━━━━━━━━━━━━━━━━━━━━━\n\nContenido que:\n- Se sienta clínico y real\n- Genere autoridad\n- Haga dudar al veterinario\n- Termine en conversión (curso)",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        1104,
+        -640
+      ],
+      "id": "905691c0-be27-4dcc-b35b-4669a5bef7af",
+      "name": "Generación de texto"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nconst output = [];\n\nfor (let i = 0; i < items.length; i++) {\n  const binaryData = await this.helpers.getBinaryDataBuffer(i, 'data');\n\n  output.push({\n    json: {\n      ...items[i].json,\n      image_base64: binaryData.toString('base64'),\n    },\n  });\n}\n\nreturn output;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1920,
+        -720
+      ],
+      "id": "3962eb89-0f80-4bbc-96a3-d3d2c1486f60",
+      "name": "Imagen a texto para el request"
+    },
+    {
+      "parameters": {
+        "keep": "lastItems"
+      },
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        880,
+        -640
+      ],
+      "id": "88f9de8a-1f6a-4057-af02-724795e6882c",
+      "name": "Limit"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.image_url }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        2240,
+        -912
+      ],
+      "id": "6e34af3c-b060-49e6-96d3-5486ac40a1bc",
+      "name": "Imagen aleatoria"
+    },
+    {
+      "parameters": {
+        "resource": "folder",
+        "name": "={{ $json.folderName }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1NKi4E_aVSFXBAttWqHTUEGa6brYsX35p",
+          "mode": "list",
+          "cachedResultName": "Generaciones",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1NKi4E_aVSFXBAttWqHTUEGa6brYsX35p"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        3248,
+        -544
+      ],
+      "id": "5c8303fa-772a-4aa7-917f-a294d091e5cc",
+      "name": "Create folder",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "UCpUzhZnv05EEu6V",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const now = new Date();\n\nconst fecha = now.toLocaleDateString('es-PE').replace(/\\//g, '-');\nconst hora = now.toTimeString().slice(0,5).replace(':', '-');\n\nconst nombre = `Generación ${fecha} ${hora} - 1`;\n\nreturn [{\n  json: {\n    folderName: nombre\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3024,
+        -544
+      ],
+      "id": "b247f3ce-b858-4d0b-8e1d-af61fd5f1532",
+      "name": "Nombre de carpeta principal"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.download_url }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        2352,
+        -544
+      ],
+      "id": "1c70a19d-1d6f-4c2b-ba1e-3993d7242f5e",
+      "name": "Descargar imágenes"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        2800,
+        -544
+      ],
+      "id": "83a7c5ba-6f58-4ff1-adcc-388e76883bf1",
+      "name": "Limit1"
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.all().map((item, index) => {\n  return {\n    json: {\n      ...item.json,\n      fileName: `opcion_${index + 1}.png`\n    },\n    binary: item.binary\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2576,
+        -544
+      ],
+      "id": "9f03594e-fae2-4b04-91ec-c2a2e336d504",
+      "name": "Nombres a imágenes"
+    },
+    {
+      "parameters": {
+        "jsCode": "const folderId = $json.id;\n\nconst items = $items(\"Nombres a imágenes\");\n\nreturn items.map(item => {\n  return {\n    json: {\n      ...item.json,\n      folderId: folderId\n    },\n    binary: item.binary\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3472,
+        -544
+      ],
+      "id": "3d44d58e-998e-4412-b895-310586d529d0",
+      "name": "Create folder Code"
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.all().map((item, index) => {\n  const variantes = $('Normalizar Variantes').all();\n  const variante = variantes[index]?.json;\n\n  if (!variante) {\n    throw new Error(`No existe variante para el índice ${index + 1}`);\n  }\n\n  const hashtags = Array.isArray(variante.hashtags)\n    ? variante.hashtags.join(' ')\n    : '';\n\n  const contenido = `${variante.caption || ''}\n\n${hashtags}\n`;\n\n  return {\n    json: {\n      ...item.json,\n      fileName: `opcion_${index + 1}.txt`\n    },\n    binary: {\n      data: {\n        data: Buffer.from(contenido, 'utf8').toString('base64'),\n        mimeType: 'text/plain',\n        fileName: `opcion_${index + 1}.txt`\n      }\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3632,
+        -752
+      ],
+      "id": "2546125c-d042-4334-9c4b-16a053de380b",
+      "name": "Crear textos"
+    },
+    {
+      "parameters": {
+        "name": "={{ $json.fileName }}",
+        "driveId": {
+          "__rl": true,
+          "value": "My Drive",
+          "mode": "list",
+          "cachedResultName": "My Drive",
+          "cachedResultUrl": "https://drive.google.com/drive/my-drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $json.folderId }}"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        3696,
+        -544
+      ],
+      "id": "ca262129-29dd-4e4c-b292-fcba7d6a1f69",
+      "name": "Subir imágenes",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "UCpUzhZnv05EEu6V",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "name": "={{ $json.fileName }}",
+        "driveId": {
+          "__rl": true,
+          "value": "My Drive",
+          "mode": "list",
+          "cachedResultName": "My Drive",
+          "cachedResultUrl": "https://drive.google.com/drive/my-drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $json.folderId }}"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        3936,
+        -768
+      ],
+      "id": "613534c1-939a-4763-9d73-4a3730b4a546",
+      "name": "Subir Textos",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "UCpUzhZnv05EEu6V",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "let raw = $json.text\n  .replace(/```json|```/g, '')\n  .trim();\n\nconst variantes = JSON.parse(raw);\n\nreturn variantes.map((v, index) => ({\n  json: {\n    ...v,\n    variante_numero: index + 1,\n    total_variantes: variantes.length,\n    image_url: `https://picsum.photos/seed/vet-${index + 1}/512`\n  }\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1456,
+        -640
+      ],
+      "id": "9a05ba9a-3ab7-416e-b5cc-0cfaab5d72b8",
+      "name": "Normalizar Variantes"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nconst output = [];\n\nfor (let i = 0; i < items.length; i++) {\n  const binaryData = await this.helpers.getBinaryDataBuffer(i, 'data');\n\n  output.push({\n    json: {\n      ...items[i].json,\n      image_base64: binaryData.toString('base64'),\n    },\n  });\n}\n\nreturn output;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2416,
+        -912
+      ],
+      "id": "a1a4f1e9-626d-4192-a537-fd48762d6943",
+      "name": "Convertir Base64"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://python-api:8000/generate-post",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"titular\": \"{{ $json.titular }}\",\n  \"textocorto\": \"{{ $json.textocorto }}\",\n  \"cta\": \"{{ $json.cta }}\",\n  \"layout_type\": \"{{ $json.layout.tipo }}\",\n  \"image_base64\": \"{{ $json.image_base64 }}\"\n}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        2128,
+        -544
+      ],
+      "id": "a7d228aa-8bb2-430e-832b-1f3450744d71",
+      "name": "Conversion_Plantillas"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Sheets Trigger": {
+      "main": [
+        [
+          {
+            "node": "Limit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mistral Cloud Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Generación de texto",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generación de Imagen": {
+      "main": [
+        [
+          {
+            "node": "Imagen a texto para el request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generación de texto": {
+      "main": [
+        [
+          {
+            "node": "Normalizar Variantes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Imagen a texto para el request": {
+      "main": [
+        [
+          {
+            "node": "Conversion_Plantillas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit": {
+      "main": [
+        [
+          {
+            "node": "Generación de texto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Imagen aleatoria": {
+      "main": [
+        [
+          {
+            "node": "Convertir Base64",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create folder": {
+      "main": [
+        [
+          {
+            "node": "Create folder Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Nombre de carpeta principal": {
+      "main": [
+        [
+          {
+            "node": "Create folder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Descargar imágenes": {
+      "main": [
+        [
+          {
+            "node": "Nombres a imágenes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit1": {
+      "main": [
+        [
+          {
+            "node": "Nombre de carpeta principal",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Nombres a imágenes": {
+      "main": [
+        [
+          {
+            "node": "Limit1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create folder Code": {
+      "main": [
+        [
+          {
+            "node": "Subir imágenes",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Crear textos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crear textos": {
+      "main": [
+        [
+          {
+            "node": "Subir Textos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalizar Variantes": {
+      "main": [
+        [
+          {
+            "node": "Generación de Imagen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convertir Base64": {
+      "main": [
+        []
+      ]
+    },
+    "Conversion_Plantillas": {
+      "main": [
+        [
+          {
+            "node": "Descargar imágenes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "9a162828-f121-423a-9885-50bb50dcc9b7",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "4f3e67832e110dccd3106c81af6569df59a0776eb77acd4e0f8edaf21529389b"
+  },
+  "id": "hRIk6waM12WzhBUr",
+  "tags": []
+}
